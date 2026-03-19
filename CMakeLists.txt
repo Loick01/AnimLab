@@ -9,6 +9,9 @@ find_package(SFML 2.6 COMPONENTS graphics window system REQUIRED)
 
 set(SOURCES
     src/main.cpp
+    src/window.cpp
+    src/application.cpp
+    src/event.cpp
 )
 
 set(SFML_LIBRARIES
