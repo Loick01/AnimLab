@@ -17,36 +17,37 @@ struct Joint
     Joint() : Joint(Vec2{0,0})
     {}
 
-    Joint(const Vec2 p) : position(p), radius(30.f)
+    Joint(const Vec2 p) : position(p), radius(10.f)
     {
         circle.setRadius(radius);
         circle.setOrigin(radius, radius);
         circle.setFillColor(sf::Color::White);
-        Update();
+        UpdatePosition();
     }
 
-    void Update() {
+    void UpdatePosition() {
         circle.setPosition(position.x, position.y);
     }
 };
 
-struct Link
+struct Link // Segment ?
 {
     Joint start;
     Joint end;
-    float angle;
+    float worldAngle; // Sum of the angles of the parent links
+    float localAngle; // Angle of the link with the previous link of the chain
     float length;
 
-    Link(const Joint j, const float a, const float l):
-        start(j), angle(a), length(l) 
+    Link(const Joint j, const float local, const float world, const float l):
+        start(j), localAngle(local), worldAngle(world), length(l) 
     {
         ComputeEnd();
     }
 
     void ComputeEnd() {
-        end.position.x = start.position.x + cos(angle) * length; 
-        end.position.y = start.position.y + sin(angle) * length;
-        end.Update();
+        end.position.x = start.position.x + cos(worldAngle + localAngle) * length; 
+        end.position.y = start.position.y + sin(worldAngle + localAngle) * length;
+        end.UpdatePosition();
     }
 };
 
@@ -60,5 +61,7 @@ class Chain : public sf::Drawable
         Chain() = default;
         Chain(const Vec2 origin, const unsigned int nrJoint, const unsigned int initialLength);
 
+        unsigned int GetNrLink() const;
+        void SetAngleAt(const unsigned int index, const float newLocalAngle);
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };

@@ -2,6 +2,7 @@
 
 #include "chain.hpp"
 #include "event.hpp"
+#include "time.hpp"
 #include "type.hpp"
 #include "window.hpp"
 
@@ -11,6 +12,7 @@ class Application
         Window m_window;
         EventController m_eventController;
         Chain m_chain;
+        Time m_time;
         bool m_isRunning;
 
     public:
