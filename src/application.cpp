@@ -2,7 +2,9 @@
 
 Application::Application(const std::string& title, const sf::Color backgroundColor):
     m_window(title, backgroundColor), m_isRunning(true)
-{}
+{
+    m_chain = Chain(Vec2{m_window.GetWidth()/2, m_window.GetHeight()}, 8, 125);
+}
 
 void Application::Run()
 {   
@@ -12,7 +14,8 @@ void Application::Run()
         m_eventController.HandleEvents();
         
         m_window.ClearBackground();
-        m_window.Draw();
+        m_window.Draw(m_chain);
+        m_window.Display();
     }
     
     m_window.Close();

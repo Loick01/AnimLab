@@ -1,6 +1,8 @@
 #pragma once
 
+#include "chain.hpp"
 #include "event.hpp"
+#include "type.hpp"
 #include "window.hpp"
 
 class Application
@@ -8,6 +10,7 @@ class Application
     private:
         Window m_window;
         EventController m_eventController;
+        Chain m_chain;
         bool m_isRunning;
 
     public:
