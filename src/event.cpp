@@ -20,4 +20,18 @@ void EventController::GetEvents(sf::RenderWindow& renderWindow)
 }
 
 void EventController::HandleEvents()
-{}
+{
+    for (const sf::Event event : m_events) {
+        switch(event.type) {
+            case sf::Event::MouseButtonPressed : {
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    int x = event.mouseButton.x;
+                    int y = event.mouseButton.y;
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+}

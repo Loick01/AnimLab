@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include "chain.hpp"
 #include "event.hpp"
 #include "time.hpp"
@@ -11,7 +12,7 @@ class Application
     private:
         Window m_window;
         EventController m_eventController;
-        Chain m_chain;
+        std::unique_ptr<Chain> m_chain;
         Time m_time;
         bool m_isRunning;
 
