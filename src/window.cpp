@@ -10,11 +10,11 @@ sf::RenderWindow& Window::GetRender()
     return m_renderWindow;
 }
 
-int Window::GetWidth() const {
+float Window::GetWidth() const {
     return m_size.x;
 }
 
-int Window::GetHeight() const {
+float Window::GetHeight() const {
     return m_size.y;
 }
 

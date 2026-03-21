@@ -1,6 +1,6 @@
 #include "chain.hpp"
 
-Chain::Chain(const Vec2 origin, const unsigned int nrJoint, const unsigned int initialLength):
+Chain::Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
     m_origin(origin)
 {
     if (nrJoint < 2) throw std::invalid_argument("A chain must have at least 2 joints\n");
@@ -42,5 +42,6 @@ void Chain::draw(sf::RenderTarget& target, sf::RenderStates states) const
     for (const Link& l : m_links) {
         target.draw(l.start.circle, states);
         target.draw(l.end.circle, states);
+        target.draw(l.line, 2, sf::Lines);
     }
 }

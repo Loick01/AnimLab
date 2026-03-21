@@ -11,14 +11,14 @@ class Window
         sf::RenderWindow m_renderWindow;
         sf::Color m_backgroungColor;
         std::string m_title;
-        sf::Vector2u m_size;
+        sf::Vector2f m_size;
 
     public:
         Window(const std::string& title, const sf::Color backgroundColor);
 
         sf::RenderWindow& GetRender();
-        int GetWidth() const;
-        int GetHeight() const;
+        float GetWidth() const;
+        float GetHeight() const;
         void ClearBackground(); // Must be called before every Draw()
         void Close();
         void Draw(const sf::Drawable& drawable);
