@@ -64,14 +64,15 @@ void FKChain::SetAngleAt(const unsigned int index, const float newLocalAngle)
     }
 }
 
-IKChain::IKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
-    Chain(origin, nrJoint, initialLength)
+IKChain::IKChain(const EventController& eventController, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
+    Chain(origin, nrJoint, initialLength), m_eventController(eventController)
 {}
 
 void IKChain::Update(const Time& time)
 {
     const float elapsedTime = time.GetElapsedTime();
-    sf::Vector2f targetPosition = {960 + 500 * cos(elapsedTime), 700 + 200 * sin(elapsedTime*2.)};
+    // sf::Vector2f targetPosition = {960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
+    sf::Vector2f targetPosition = sf::Vector2f(m_eventController.GetMousePosition());
     
     // Forward pass
     const unsigned int lastIndex = m_links.size()-1; // Last link index of the chain

@@ -1,5 +1,14 @@
 #include "event.hpp"
 
+EventController::EventController(sf::RenderWindow& renderWindow):
+    m_mousePosition(sf::Mouse::getPosition(renderWindow))
+{}
+
+sf::Vector2i EventController::GetMousePosition() const
+{
+    return m_mousePosition;
+}
+
 bool EventController::HandleWindowEvents()
 {
     for (const sf::Event event : m_events) {
@@ -23,11 +32,8 @@ void EventController::HandleEvents()
 {
     for (const sf::Event event : m_events) {
         switch(event.type) {
-            case sf::Event::MouseButtonPressed : {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    int x = event.mouseButton.x;
-                    int y = event.mouseButton.y;
-                }
+            case sf::Event::MouseMoved : {
+                m_mousePosition = {event.mouseMove.x, event.mouseMove.y};
                 break;
             }
             default:

@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <vector>
 
+#include "event.hpp"
 #include "time.hpp"
 #include "type.hpp"
 
@@ -99,9 +100,12 @@ class FKChain : public Chain
 
 class IKChain : public Chain
 {
+    private:
+        const EventController& m_eventController; // Should not be here
+    
     public:
         IKChain() = default;
-        IKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
+        IKChain(const EventController& eventController, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
 
         void Update(const Time& time) override;
 };
