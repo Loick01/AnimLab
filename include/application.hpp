@@ -22,5 +22,6 @@ class Application
     public:
         Application(const std::string& title, const sf::Color backgroundColor);
 
+        void SwitchChain(const ChainType e);
         void Run();
 };

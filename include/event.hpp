@@ -1,6 +1,7 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Window/Event.hpp>
 #include <vector>
 
 class EventController
@@ -12,8 +13,9 @@ class EventController
     public:
         EventController(sf::RenderWindow& renderWindow);
 
+        std::vector<sf::Event>& GetEvents();
         sf::Vector2i GetMousePosition() const;
         bool HandleWindowEvents();
-        void GetEvents(sf::RenderWindow& renderWindow); // Should be in Window class ?
+        void PollEvents(sf::RenderWindow& renderWindow); // Should be in Window class ?
         void HandleEvents();
 };

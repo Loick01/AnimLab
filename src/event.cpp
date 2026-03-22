@@ -4,6 +4,11 @@ EventController::EventController(sf::RenderWindow& renderWindow):
     m_mousePosition(sf::Mouse::getPosition(renderWindow))
 {}
 
+std::vector<sf::Event>& EventController::GetEvents()
+{
+    return m_events;
+}
+
 sf::Vector2i EventController::GetMousePosition() const
 {
     return m_mousePosition;
@@ -20,7 +25,7 @@ bool EventController::HandleWindowEvents()
     return true;
 }
 
-void EventController::GetEvents(sf::RenderWindow& renderWindow)
+void EventController::PollEvents(sf::RenderWindow& renderWindow)
 {   
     m_events.clear();
     sf::Event event;
