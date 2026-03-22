@@ -71,8 +71,8 @@ IKChain::IKChain(const EventController& eventController, const sf::Vector2f orig
 void IKChain::Update(const Time& time)
 {
     const float elapsedTime = time.GetElapsedTime();
-    // sf::Vector2f targetPosition = {960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
-    sf::Vector2f targetPosition = sf::Vector2f(m_eventController.GetMousePosition());
+    sf::Vector2f targetPosition = {960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
+    // sf::Vector2f targetPosition = sf::Vector2f(m_eventController.GetMousePosition());
     
     // Forward pass
     const unsigned int lastIndex = m_links.size()-1; // Last link index of the chain
@@ -97,5 +97,4 @@ void IKChain::Update(const Time& time)
         m_links[i].SetEndPosition(newPos);
         if (i != m_links.size()-1) m_links[i+1].start = m_links[i].end;
     }
-
 }

@@ -8,19 +8,23 @@ struct Time
     float elapsedTime;
     sf::Time currentTime;
     sf::Time previousTime;
-    float deltaTime;
+    sf::Time deltaTime;
 
-    Time() : previousTime(clock.getElapsedTime()), deltaTime(0.f), elapsedTime(0.f)
+    Time() : previousTime(clock.getElapsedTime()), deltaTime(sf::Time::Zero), elapsedTime(0.f)
     {}
+
+    sf::Clock& GetClock() {
+        return clock;
+    }
 
     void Update()
     {
         currentTime = clock.getElapsedTime();
-        deltaTime = (currentTime-previousTime).asSeconds();
+        deltaTime = currentTime-previousTime;
         previousTime = currentTime;
     }
 
-    float GetDeltaTime() const
+    sf::Time GetDeltaTime() const
     {
         return deltaTime;
     }

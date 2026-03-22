@@ -1,7 +1,7 @@
 #include "application.hpp"
 
 Application::Application(const std::string& title, const sf::Color backgroundColor):
-    m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender())
+    m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), m_gui(m_window.GetRender())
 {
     //m_chain = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 20, 40);
     m_chain = std::make_unique<IKChain>(m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 20, 40);
@@ -18,6 +18,8 @@ void Application::Run()
         m_window.ClearBackground();
         m_window.Draw(*m_chain);
         m_chain->Update(m_time);
+        m_gui.SetFrame(m_time.GetDeltaTime());
+        m_gui.Draw();
         m_window.Display();
     }
     
