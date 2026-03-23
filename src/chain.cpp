@@ -1,14 +1,14 @@
 #include "chain.hpp"
 
 Chain::Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
-    m_origin(origin)
+    m_origin(origin), m_jointColor(sf::Color::White) // Default joint color will not stay here
 {
     if (nrJoint < 2) throw std::invalid_argument("A chain must have at least 2 joints\n");
-    Joint currentJoint(m_origin);
+    Joint currentJoint(m_origin, m_jointColor);
     float localAngle = -90.f; // First link only
     float worldAngle = 0.f; 
     for (unsigned int i = 0 ; i < nrJoint-1 ; i++) {
-        Link l(currentJoint, radians(localAngle), radians(worldAngle), initialLength);
+        Link l(currentJoint, m_jointColor, radians(localAngle), radians(worldAngle), initialLength);
         m_links.push_back(l);
         currentJoint = l.end;
         worldAngle += localAngle;
@@ -23,9 +23,23 @@ sf::Vector2f Chain::Normalize(const sf::Vector2f v)
     return v/norm;
 }
 
+sf::Color Chain::GetColor() const
+{
+    return m_jointColor;
+}
+
 unsigned int Chain::GetNrLink() const
 {
     return m_links.size();
+}
+
+void Chain::SetColor(const sf::Color c)
+{
+    m_jointColor = c;
+    for (Link& l : m_links) { // Update joints with the same color (later every joint will have his own color)
+        l.start.SetColor(m_jointColor);
+        l.end.SetColor(m_jointColor);
+    }
 }
 
 void Chain::draw(sf::RenderTarget& target, sf::RenderStates states) const

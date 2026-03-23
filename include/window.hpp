@@ -9,7 +9,7 @@ class Window
         void CreateWindow();
 
         sf::RenderWindow m_renderWindow;
-        sf::Color m_backgroungColor;
+        sf::Color m_backgroundColor;
         std::string m_title;
         sf::Vector2f m_size;
 
@@ -17,6 +17,7 @@ class Window
         Window(const std::string& title, const sf::Color backgroundColor);
 
         sf::RenderWindow& GetRender();
+        sf::Color& GetBackgroundColor();
         float GetWidth() const;
         float GetHeight() const;
         void ClearBackground(); // Must be called before every Draw()

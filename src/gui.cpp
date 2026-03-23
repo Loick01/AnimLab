@@ -1,7 +1,8 @@
 #include "gui.hpp"
 
-ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow):
-    m_renderWindow(renderWindow), m_selectedChain(1) // m_selectedChain should be initialized according to the default chain type in Application constructor
+ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor):
+    m_renderWindow(renderWindow), m_backgroundColor(backgroundColor), 
+    m_selectedChain(1) // m_selectedChain should be initialized according to the default chain type in Application constructor
 {
     if (!ImGui::SFML::Init(m_renderWindow))
         throw std::runtime_error("Failed to initialize ImGui SFML\n");
@@ -13,7 +14,7 @@ ImGuiLayer::~ImGuiLayer()
 }
 
 void ImGuiLayer::SetChain(Chain* chain){
-    m_chain = m_chain;
+    m_chain = chain;
 }
 
 void ImGuiLayer::SetFrame(const sf::Time deltaTime)
@@ -31,6 +32,27 @@ void ImGuiLayer::SetFrame(const sf::Time deltaTime)
             }
         }
         ImGui::EndCombo();
+    }
+
+    float bgColor[3] = {m_backgroundColor.r/255.f, m_backgroundColor.g/255.f, m_backgroundColor.b/255.f};
+    if (ImGui::ColorEdit3("Background color", bgColor)) {
+        m_backgroundColor = {
+            static_cast<std::uint8_t>(bgColor[0]*255), 
+            static_cast<std::uint8_t>(bgColor[1]*255),
+            static_cast<std::uint8_t>(bgColor[2]*255)
+        };
+    }
+
+    sf::Color chainColor = m_chain->GetColor();
+    float jointColor[3] = {chainColor.r/255.f, chainColor.g/255.f, chainColor.b/255.f};
+    if (ImGui::ColorEdit3("Joint color", jointColor)) {
+        chainColor = {
+            static_cast<std::uint8_t>(jointColor[0]*255), 
+            static_cast<std::uint8_t>(jointColor[1]*255),
+            static_cast<std::uint8_t>(jointColor[2]*255)
+        };
+
+        m_chain->SetColor(chainColor);
     }
 
     ImGui::End();

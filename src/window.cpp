@@ -2,12 +2,17 @@
 
 Window::Window(const std::string& title, const sf::Color backgroundColor):
     m_renderWindow(sf::VideoMode::getDesktopMode(), title, sf::Style::Fullscreen),
-    m_backgroungColor(backgroundColor), m_size(m_renderWindow.getSize())
+    m_backgroundColor(backgroundColor), m_size(m_renderWindow.getSize())
 {}
 
 sf::RenderWindow& Window::GetRender()
 {
     return m_renderWindow;
+}
+
+sf::Color& Window::GetBackgroundColor()
+{
+    return m_backgroundColor;
 }
 
 float Window::GetWidth() const {
@@ -20,7 +25,7 @@ float Window::GetHeight() const {
 
 void Window::ClearBackground()
 {
-    m_renderWindow.clear(m_backgroungColor);
+    m_renderWindow.clear(m_backgroundColor);
 }
 
 void Window::Close()

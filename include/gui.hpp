@@ -20,10 +20,11 @@ class ImGuiLayer : public Notifier<ChainType>
     private:
         sf::RenderWindow& m_renderWindow;
         Chain* m_chain;
+        sf::Color& m_backgroundColor;
         unsigned int m_selectedChain;
 
     public:
-        ImGuiLayer(sf::RenderWindow& renderWindow);
+        ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor);
         ~ImGuiLayer();
 
         void SetChain(Chain* chain);

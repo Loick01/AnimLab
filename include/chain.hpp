@@ -16,15 +16,23 @@ struct Joint
     float radius;
     sf::CircleShape circle;
 
-    Joint() : Joint(sf::Vector2f{0.,0.})
+    Joint(const sf::Color c) : Joint(sf::Vector2f{0.,0.}, c)
     {}
 
-    Joint(const sf::Vector2f p) : position(p), radius(10.f)
+    Joint(const sf::Vector2f p, const sf::Color c) : position(p), radius(10.f)
     {
-        circle.setRadius(radius);
+        SetRadius(radius);
         circle.setOrigin(radius, radius);
-        circle.setFillColor(sf::Color::White);
+        SetColor(c);
         UpdateCirclePosition();
+    }
+
+    void SetColor(const sf::Color c) {
+        circle.setFillColor(c);
+    }
+
+    void SetRadius(const float r) {
+        circle.setRadius(r);
     }
 
     void UpdateCirclePosition() {
@@ -41,8 +49,8 @@ struct Link
     float localAngle; // Angle of the link with the previous link of the chain
     float length;
 
-    Link(const Joint j, const float local, const float world, const float l):
-        start(j), localAngle(local), worldAngle(world), length(l) 
+    Link(const Joint j, const sf::Color c, const float local, const float world, const float l):
+        start(j), end(c), localAngle(local), worldAngle(world), length(l) 
     {
         ComputeEndWithAngle();
     }
@@ -73,6 +81,7 @@ class Chain : public sf::Drawable
     protected:
         const sf::Vector2f m_origin;
         std::vector<Link> m_links;
+        sf::Color m_jointColor;
 
     public:
         Chain() = default;
@@ -81,8 +90,10 @@ class Chain : public sf::Drawable
 
         static sf::Vector2f Normalize(const sf::Vector2f v);
 
+        sf::Color GetColor() const;
         unsigned int GetNrLink() const;
         virtual void Update(const Time& time) = 0;
+        void SetColor(const sf::Color c);
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 

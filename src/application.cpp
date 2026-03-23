@@ -1,7 +1,8 @@
 #include "application.hpp"
 
 Application::Application(const std::string& title, const sf::Color backgroundColor):
-    m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), m_gui(m_window.GetRender())
+    m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), 
+    m_gui(m_window.GetRender(), m_window.GetBackgroundColor())
 {
     SwitchChain(ChainType::IK_FABRIK); // Default chain type
     m_gui.AddCallback([this](ChainType e){SwitchChain(e);});
