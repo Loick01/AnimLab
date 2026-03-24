@@ -32,11 +32,11 @@ void Application::SwitchChain(const ChainType e)
 {
     switch(e){
         case ChainType::FK: {
-            m_chain = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 20, 40);
+            m_chain = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
             break;
         } 
         case ChainType::IK_FABRIK: {
-            m_chain = std::make_unique<IKChain>(m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 20, 40);
+            m_chain = std::make_unique<IKChain>(m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
             break;
         }
         default:

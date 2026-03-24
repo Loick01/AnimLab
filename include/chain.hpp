@@ -7,6 +7,8 @@
 #include <vector>
 
 #include "event.hpp"
+#include "imgui.h"
+#include "imgui-SFML.h"
 #include "time.hpp"
 #include "type.hpp"
 
@@ -81,7 +83,9 @@ class Chain : public sf::Drawable
     protected:
         const sf::Vector2f m_origin;
         std::vector<Link> m_links;
-        sf::Color m_jointColor;
+        sf::Color m_jointColor; // Will be removed
+        unsigned int m_initialLength; // Will be removed
+        int m_nrJoint;
 
     public:
         Chain() = default;
@@ -93,7 +97,10 @@ class Chain : public sf::Drawable
         sf::Color GetColor() const;
         unsigned int GetNrLink() const;
         virtual void Update(const Time& time) = 0;
-        void SetColor(const sf::Color c);
+        virtual void SetChainGUI();
+        void AddJoint(); // Add/Remove at the end of m_links
+        void RemoveJoint();
+        void UpdateJointColor();
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 };
 
@@ -107,16 +114,22 @@ class FKChain : public Chain
         FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
 
         void Update(const Time& time) override;
+        void SetChainGUI() override;
 };
 
 class IKChain : public Chain
 {
     private:
         const EventController& m_eventController; // Should not be here
+
+        // Will be removed (use a struct) ?
+        bool m_isAimingMouse;
+        bool m_doBackwardPass;
     
     public:
         IKChain() = default;
         IKChain(const EventController& eventController, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
 
         void Update(const Time& time) override;
+        void SetChainGUI() override;
 };

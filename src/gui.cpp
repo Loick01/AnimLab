@@ -43,17 +43,7 @@ void ImGuiLayer::SetFrame(const sf::Time deltaTime)
         };
     }
 
-    sf::Color chainColor = m_chain->GetColor();
-    float jointColor[3] = {chainColor.r/255.f, chainColor.g/255.f, chainColor.b/255.f};
-    if (ImGui::ColorEdit3("Joint color", jointColor)) {
-        chainColor = {
-            static_cast<std::uint8_t>(jointColor[0]*255), 
-            static_cast<std::uint8_t>(jointColor[1]*255),
-            static_cast<std::uint8_t>(jointColor[2]*255)
-        };
-
-        m_chain->SetColor(chainColor);
-    }
+    m_chain->SetChainGUI();
 
     ImGui::End();
 }
