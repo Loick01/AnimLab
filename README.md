@@ -15,7 +15,7 @@
     <td align="center">
       <img src="./screenshot/ik2.gif" height="330"/>
       <br>
-      <strong>Inverse Kinematics (without the backward pass)</strong>
+      <strong>IK (without the backward pass)</strong>
     </td>
   </tr>
 </table>
