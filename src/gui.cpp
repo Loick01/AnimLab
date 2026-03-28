@@ -2,7 +2,7 @@
 
 ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor):
     m_renderWindow(renderWindow), m_backgroundColor(backgroundColor), 
-    m_selectedChain(1) // m_selectedChain should be initialized according to the default chain type in Application constructor
+    m_selectedScene(1) // m_selectedScene should be initialized according to the default scene type in Application constructor
 {
     if (!ImGui::SFML::Init(m_renderWindow))
         throw std::runtime_error("Failed to initialize ImGui SFML\n");
@@ -13,8 +13,8 @@ ImGuiLayer::~ImGuiLayer()
     ImGui::SFML::Shutdown();
 }
 
-void ImGuiLayer::SetChain(Chain* chain){
-    m_chain = chain;
+void ImGuiLayer::SetElement(Element* element){
+    m_element = element;
 }
 
 void ImGuiLayer::SetFrame(const sf::Time deltaTime)
@@ -22,13 +22,13 @@ void ImGuiLayer::SetFrame(const sf::Time deltaTime)
     ImGui::SFML::Update(m_renderWindow, deltaTime);
     ImGui::Begin("AnimLab");
 
-    const char* chainList[] = {"Forward Kinematics", "Inverse Kinematics (FABRIK)"}; // Must be the same order than ChainType
+    const char* sceneList[] = {"Forward Kinematics", "Inverse Kinematics (FABRIK)", "Body 2D"}; // Must be the same order than SceneType
 
-    if (ImGui::BeginCombo("Chain Type", chainList[m_selectedChain])){
-        for (int i = 0; i < IM_ARRAYSIZE(chainList); i++){
-            if (ImGui::Selectable(chainList[i])){
-                m_selectedChain = i;
-                Notify(static_cast<ChainType>(m_selectedChain));
+    if (ImGui::BeginCombo("Scene", sceneList[m_selectedScene])){
+        for (int i = 0; i < IM_ARRAYSIZE(sceneList); i++){
+            if (ImGui::Selectable(sceneList[i])){
+                m_selectedScene = i;
+                Notify(static_cast<SceneType>(m_selectedScene));
             }
         }
         ImGui::EndCombo();
@@ -43,7 +43,7 @@ void ImGuiLayer::SetFrame(const sf::Time deltaTime)
         };
     }
 
-    m_chain->SetChainGUI();
+    m_element->SetElementGUI();
 
     ImGui::End();
 }

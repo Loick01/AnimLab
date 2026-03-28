@@ -7,27 +7,27 @@
 #include "imgui.h"
 #include "imgui-SFML.h"
 
-#include "chain.hpp"
+#include "element.hpp"
 #include "notifier.hpp"
 
-enum class ChainType
+enum class SceneType
 {
-    FK, IK_FABRIK //, IK_CCD
+    FK, IK_FABRIK, BODY_2D //, IK_CCD, BODY_3D
 };
 
-class ImGuiLayer : public Notifier<ChainType>
+class ImGuiLayer : public Notifier<SceneType>
 {
     private:
         sf::RenderWindow& m_renderWindow;
-        Chain* m_chain;
+        Element* m_element;
         sf::Color& m_backgroundColor;
-        unsigned int m_selectedChain;
+        unsigned int m_selectedScene;
 
     public:
         ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor);
         ~ImGuiLayer();
 
-        void SetChain(Chain* chain);
+        void SetElement(Element* element);
         void HandleEvents(std::vector<sf::Event> events);
         void SetFrame(const sf::Time deltaTime);
         void Draw();

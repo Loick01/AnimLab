@@ -1,15 +1,13 @@
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
-
 #include <cmath>
 #include <stdexcept>
 #include <vector>
 
+#include "element.hpp"
 #include "event.hpp"
 #include "imgui.h"
 #include "imgui-SFML.h"
-#include "time.hpp"
 #include "type.hpp"
 
 struct Joint
@@ -78,7 +76,7 @@ struct Link
     }
 };
 
-class Chain : public sf::Drawable
+class Chain : public Element
 {
     protected:
         const sf::Vector2f m_origin;
@@ -96,8 +94,7 @@ class Chain : public sf::Drawable
 
         sf::Color GetColor() const;
         unsigned int GetNrLink() const;
-        virtual void Update(const Time& time) = 0;
-        virtual void SetChainGUI();
+        void SetElementGUI() override;
         void AddJoint(); // Add/Remove at the end of m_links
         void RemoveJoint();
         void UpdateJointColor();
@@ -114,7 +111,7 @@ class FKChain : public Chain
         FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
 
         void Update(const Time& time) override;
-        void SetChainGUI() override;
+        void SetElementGUI() override;
 };
 
 class IKChain : public Chain
@@ -131,5 +128,5 @@ class IKChain : public Chain
         IKChain(const EventController& eventController, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
 
         void Update(const Time& time) override;
-        void SetChainGUI() override;
+        void SetElementGUI() override;
 };

@@ -2,7 +2,9 @@
 
 #include <memory>
 
+#include "body.hpp"
 #include "chain.hpp"
+#include "element.hpp"
 #include "event.hpp"
 #include "gui.hpp"
 #include "time.hpp"
@@ -15,13 +17,13 @@ class Application
         Window m_window;
         EventController m_eventController;
         ImGuiLayer m_gui;
-        std::unique_ptr<Chain> m_chain;
+        std::unique_ptr<Element> m_element;
         Time m_time;
         bool m_isRunning;
 
     public:
         Application(const std::string& title, const sf::Color backgroundColor);
 
-        void SwitchChain(const ChainType e);
+        void SwitchScene(const SceneType e);
         void Run();
 };

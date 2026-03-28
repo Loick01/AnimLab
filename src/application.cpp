@@ -4,8 +4,8 @@ Application::Application(const std::string& title, const sf::Color backgroundCol
     m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), 
     m_gui(m_window.GetRender(), m_window.GetBackgroundColor())
 {
-    SwitchChain(ChainType::IK_FABRIK); // Default chain type
-    m_gui.AddCallback([this](ChainType e){SwitchChain(e);});
+    SwitchScene(SceneType::IK_FABRIK); // Default scene type
+    m_gui.AddCallback([this](SceneType e){SwitchScene(e);});
 }
 
 void Application::Run()
@@ -18,8 +18,8 @@ void Application::Run()
         m_gui.HandleEvents(m_eventController.GetEvents());
         
         m_window.ClearBackground();
-        m_window.Draw(*m_chain);
-        m_chain->Update(m_time);
+        m_window.Draw(*m_element);
+        m_element->Update(m_time);
         m_gui.SetFrame(m_time.GetDeltaTime());
         m_gui.Draw();
         m_window.Display();
@@ -28,19 +28,23 @@ void Application::Run()
     m_window.Close();
 }
 
-void Application::SwitchChain(const ChainType e)
+void Application::SwitchScene(const SceneType e)
 {
     switch(e){
-        case ChainType::FK: {
-            m_chain = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
+        case SceneType::FK: {
+            m_element = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
             break;
         } 
-        case ChainType::IK_FABRIK: {
-            m_chain = std::make_unique<IKChain>(m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
+        case SceneType::IK_FABRIK: {
+            m_element = std::make_unique<IKChain>(m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
+            break;
+        }
+        case SceneType::BODY_2D: {
+            m_element = std::make_unique<Body>();
             break;
         }
         default:
-            throw std::invalid_argument("Unknown chain type");
+            throw std::invalid_argument("Unknown scene");
     }
-    m_gui.SetChain(m_chain.get());
+    m_gui.SetElement(m_element.get());
 }

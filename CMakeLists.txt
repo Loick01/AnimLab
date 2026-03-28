@@ -14,6 +14,7 @@ set(SOURCES
     src/event.cpp
     src/chain.cpp
     src/gui.cpp
+    src/body.cpp
 )
 
 set(SFML_LIBRARIES

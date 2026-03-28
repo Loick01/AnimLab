@@ -64,7 +64,7 @@ void Chain::RemoveJoint()
     m_links.pop_back();
 }
 
-void Chain::SetChainGUI()
+void Chain::SetElementGUI()
 {
     if (ImGui::SliderInt("Number of joint", &m_nrJoint, 2, 100)){
         const unsigned int nrLink = m_links.size();
@@ -115,9 +115,9 @@ void FKChain::SetAngleAt(const unsigned int index, const float newLocalAngle)
     }
 }
 
-void FKChain::SetChainGUI()
+void FKChain::SetElementGUI()
 {
-    Chain::SetChainGUI();
+    Chain::SetElementGUI();
     // Nothing yet
 }
 
@@ -159,9 +159,9 @@ void IKChain::Update(const Time& time)
     }
 }
 
-void IKChain::SetChainGUI()
+void IKChain::SetElementGUI()
 {
-    Chain::SetChainGUI();
+    Chain::SetElementGUI();
 
     // Use a ImGui::BeginCombo for more than 2 modes
     if (ImGui::RadioButton("Aim mouse cursor", m_isAimingMouse))
