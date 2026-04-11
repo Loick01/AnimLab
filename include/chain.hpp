@@ -4,11 +4,18 @@
 #include <stdexcept>
 #include <vector>
 
+#include <SFML/Graphics/CircleShape.hpp>
+
 #include "element.hpp"
 #include "event.hpp"
 #include "imgui.h"
 #include "imgui-SFML.h"
 #include "type.hpp"
+
+enum class TargetMode
+{
+    AimingMouse, Rotating, Walking 
+};
 
 struct Joint
 {
@@ -119,13 +126,15 @@ class IKChain : public Chain
     private:
         const EventController* m_eventController; // Not here ?
         
+        TargetMode m_targetMode;
+
         // Will be removed (use a struct) ?
         bool m_isAimingMouse;
         bool m_doBackwardPass;
     
     public:
         IKChain() = default;
-        IKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, const EventController* eventController = nullptr);
+        IKChain(const TargetMode targetMode, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, const EventController* eventController = nullptr);
 
         sf::Vector2f GetTargetPosition(const float elapsedTime) const;
         void Update(const Time& time) override;

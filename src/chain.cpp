@@ -121,19 +121,28 @@ void FKChain::SetElementGUI()
     // Nothing yet
 }
 
-IKChain::IKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, const EventController* eventController):
-    Chain(origin, nrJoint, initialLength), m_eventController(eventController), m_isAimingMouse(false), m_doBackwardPass(true)
+IKChain::IKChain(const TargetMode targetMode, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, 
+const EventController* eventController) :
+    Chain(origin, nrJoint, initialLength), m_eventController(eventController),
+    m_targetMode(targetMode), m_isAimingMouse(m_targetMode == TargetMode::AimingMouse), m_doBackwardPass(true)
 {}
 
 sf::Vector2f IKChain::GetTargetPosition(const float elapsedTime) const
 {
-    if (m_isAimingMouse) {
-        if (m_eventController == nullptr) {
-            throw std::runtime_error("EventController should not be nullptr if isAimingMouse is true\n"); // Because Body need IKChain whithout EventController
+    switch(m_targetMode) {
+        case TargetMode::AimingMouse: {
+            if (m_eventController == nullptr) {
+                throw std::runtime_error("EventController should not be nullptr with AimingMouse mode\n"); // Because Body need IKChain without EventController
+            }
+            return sf::Vector2f(m_eventController->GetMousePosition());
         }
-        return sf::Vector2f(m_eventController->GetMousePosition());
+        case TargetMode::Rotating:
+            return sf::Vector2f{960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
+        case TargetMode::Walking:
+            return sf::Vector2f{1000.f, 1080.f}; // TODO
+        default:
+            throw std::invalid_argument("Unknown target mode");
     }
-    return sf::Vector2f{960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
 }
 
 void IKChain::Update(const Time& time)
@@ -172,10 +181,14 @@ void IKChain::SetElementGUI()
     Chain::SetElementGUI();
 
     // Use a ImGui::BeginCombo for more than 2 modes
-    if (ImGui::RadioButton("Aim mouse cursor", m_isAimingMouse))
+    if (ImGui::RadioButton("Aim mouse cursor", m_isAimingMouse)) {
         m_isAimingMouse = true;
-    if (ImGui::RadioButton("Compute target with elapsed time", !m_isAimingMouse))
+        m_targetMode = TargetMode::AimingMouse;
+    }
+    if (ImGui::RadioButton("Compute target with elapsed time", !m_isAimingMouse)) {
         m_isAimingMouse = false;
+        m_targetMode = TargetMode::Rotating;
+    }
 
     ImGui::Checkbox("Perform backward pass", &m_doBackwardPass);
 }
