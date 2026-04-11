@@ -117,16 +117,17 @@ class FKChain : public Chain
 class IKChain : public Chain
 {
     private:
-        const EventController& m_eventController; // Should not be here
-
+        const EventController* m_eventController; // Not here ?
+        
         // Will be removed (use a struct) ?
         bool m_isAimingMouse;
         bool m_doBackwardPass;
     
     public:
         IKChain() = default;
-        IKChain(const EventController& eventController, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
+        IKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, const EventController* eventController = nullptr);
 
+        sf::Vector2f GetTargetPosition(const float elapsedTime) const;
         void Update(const Time& time) override;
         void SetElementGUI() override;
 };

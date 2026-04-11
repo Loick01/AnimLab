@@ -2,7 +2,7 @@
 
 ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor):
     m_renderWindow(renderWindow), m_backgroundColor(backgroundColor), 
-    m_selectedScene(1) // m_selectedScene should be initialized according to the default scene type in Application constructor
+    m_selectedScene(2) // m_selectedScene should be initialized according to the default scene type in Application constructor
 {
     if (!ImGui::SFML::Init(m_renderWindow))
         throw std::runtime_error("Failed to initialize ImGui SFML\n");

@@ -121,16 +121,24 @@ void FKChain::SetElementGUI()
     // Nothing yet
 }
 
-IKChain::IKChain(const EventController& eventController, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
+IKChain::IKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, const EventController* eventController):
     Chain(origin, nrJoint, initialLength), m_eventController(eventController), m_isAimingMouse(false), m_doBackwardPass(true)
 {}
 
+sf::Vector2f IKChain::GetTargetPosition(const float elapsedTime) const
+{
+    if (m_isAimingMouse) {
+        if (m_eventController == nullptr) {
+            throw std::runtime_error("EventController should not be nullptr if isAimingMouse is true\n"); // Because Body need IKChain whithout EventController
+        }
+        return sf::Vector2f(m_eventController->GetMousePosition());
+    }
+    return sf::Vector2f{960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
+}
+
 void IKChain::Update(const Time& time)
 {
-    const float elapsedTime = time.GetElapsedTime();
-    sf::Vector2f targetPosition = m_isAimingMouse ? // Add GetTargetPosition() ? (if more than 2 modes)
-        sf::Vector2f(m_eventController.GetMousePosition()) :
-        sf::Vector2f{960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
+    sf::Vector2f targetPosition = GetTargetPosition(time.GetElapsedTime());
     
     // Forward pass
     const unsigned int lastIndex = m_links.size()-1; // Last link index of the chain

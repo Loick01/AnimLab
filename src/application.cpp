@@ -4,7 +4,7 @@ Application::Application(const std::string& title, const sf::Color backgroundCol
     m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), 
     m_gui(m_window.GetRender(), m_window.GetBackgroundColor())
 {
-    SwitchScene(SceneType::IK_FABRIK); // Default scene type
+    SwitchScene(SceneType::BODY_2D); // Default scene type
     m_gui.AddCallback([this](SceneType e){SwitchScene(e);});
 }
 
@@ -36,11 +36,11 @@ void Application::SwitchScene(const SceneType e)
             break;
         } 
         case SceneType::IK_FABRIK: {
-            m_element = std::make_unique<IKChain>(m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
+            m_element = std::make_unique<IKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40, &m_eventController);
             break;
         }
         case SceneType::BODY_2D: {
-            m_element = std::make_unique<Body>();
+            m_element = std::make_unique<Body>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()/2});
             break;
         }
         default:
