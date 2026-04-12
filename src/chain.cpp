@@ -64,6 +64,11 @@ void Chain::RemoveJoint()
     m_links.pop_back();
 }
 
+void Chain::SetOrigin(const sf::Vector2f origin)
+{
+    m_origin = origin;
+}
+
 void Chain::SetElementGUI()
 {
     if (ImGui::SliderInt("Number of joint", &m_nrJoint, 2, 100)){
@@ -121,8 +126,8 @@ void FKChain::SetElementGUI()
     // Nothing yet
 }
 
-IKChain::IKChain(const TargetMode targetMode, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, 
-const EventController* eventController) :
+IKChain::IKChain(const TargetMode targetMode, const unsigned int nrJoint, const unsigned int initialLength, 
+const EventController* eventController, const sf::Vector2f origin) :
     Chain(origin, nrJoint, initialLength), m_eventController(eventController),
     m_targetMode(targetMode), m_isAimingMouse(m_targetMode == TargetMode::AimingMouse), m_doBackwardPass(true)
 {}
@@ -139,10 +144,20 @@ sf::Vector2f IKChain::GetTargetPosition(const float elapsedTime) const
         case TargetMode::Rotating:
             return sf::Vector2f{960 + 500 * (float)cos(elapsedTime), 700 + 200 * (float)sin(elapsedTime*2.)};
         case TargetMode::Walking:
-            return sf::Vector2f{1000.f, 1080.f}; // TODO
+            return m_currentTarget;
         default:
             throw std::invalid_argument("Unknown target mode");
     }
+}
+
+sf::Vector2f IKChain::GetCurrentTarget() const
+{
+    return m_currentTarget;
+}
+
+void IKChain::SetCurrentTarget(const sf::Vector2f target)
+{
+    m_currentTarget = target;
 }
 
 void IKChain::Update(const Time& time)

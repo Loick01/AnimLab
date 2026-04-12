@@ -86,7 +86,7 @@ struct Link
 class Chain : public Element
 {
     protected:
-        const sf::Vector2f m_origin;
+        sf::Vector2f m_origin;
         std::vector<Link> m_links;
         sf::Color m_jointColor; // Will be removed
         unsigned int m_initialLength; // Will be removed
@@ -101,6 +101,7 @@ class Chain : public Element
 
         sf::Color GetColor() const;
         unsigned int GetNrLink() const;
+        void SetOrigin(const sf::Vector2f origin);
         void SetElementGUI() override;
         void AddJoint(); // Add/Remove at the end of m_links
         void RemoveJoint();
@@ -127,6 +128,7 @@ class IKChain : public Chain
         const EventController* m_eventController; // Not here ?
         
         TargetMode m_targetMode;
+        sf::Vector2f m_currentTarget; // Currently only used for Walking mode
 
         // Will be removed (use a struct) ?
         bool m_isAimingMouse;
@@ -134,9 +136,12 @@ class IKChain : public Chain
     
     public:
         IKChain() = default;
-        IKChain(const TargetMode targetMode, const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength, const EventController* eventController = nullptr);
+        IKChain(const TargetMode targetMode, const unsigned int nrJoint, const unsigned int initialLength,
+            const EventController* eventController = nullptr, const sf::Vector2f origin = {0.f, 0.f});
 
         sf::Vector2f GetTargetPosition(const float elapsedTime) const;
+        sf::Vector2f GetCurrentTarget() const;
+        void SetCurrentTarget(const sf::Vector2f target);
         void Update(const Time& time) override;
         void SetElementGUI() override;
 };
