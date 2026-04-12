@@ -40,7 +40,7 @@ void Application::SwitchScene(const SceneType e)
             break;
         }
         case SceneType::BODY_2D: {
-            m_element = std::make_unique<Body>(sf::Vector2f{150.f, 150.f}, sf::Vector2f{m_window.GetWidth()/2, 0.f}, m_window.GetHeight(), 3, 40);
+            m_element = std::make_unique<Body>(m_eventController, sf::Vector2f{150.f, 400.f}, sf::Vector2f{m_window.GetWidth()/2, 0.f}, m_window.GetHeight(), 3, 80);
             break;
         }
         default:
