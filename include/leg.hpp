@@ -7,9 +7,25 @@ enum class State
     Rest, Lift
 };
 
+struct LegAnimation
+{
+    float t; // [0., 1.]
+    float speed; // ]0., ]
+    float height;
+    float startX;
+    float endX;
+
+    LegAnimation(const float h) {
+        t = 0.f;
+        speed = 8.f;
+        height = h; 
+    }
+};
+
 class Leg : public IKChain
 {
     private:
+        LegAnimation m_anim;
         State m_state; 
         sf::Vector2f m_nextTarget; // Current target is in IKChain
         float m_distanceThreshold;
