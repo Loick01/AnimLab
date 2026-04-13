@@ -15,6 +15,7 @@ set(SOURCES
     src/chain.cpp
     src/gui.cpp
     src/body.cpp
+    src/leg.cpp
 )
 
 set(SFML_LIBRARIES
