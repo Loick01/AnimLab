@@ -93,6 +93,14 @@ void Chain::SetElementGUI()
     }
 }
 
+void Chain::SetAngleGUI() 
+{   
+    for (unsigned int i = 0 ; i < m_links.size() ; i++) {
+        const Link l = m_links[i];
+        ImGui::Text("Link %d : World Angle = %f / Local Angle = %f", i, degrees(l.worldAngle), degrees(l.localAngle));
+    }
+}
+
 FKChain::FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
     Chain(origin, nrJoint, initialLength)
 {}
@@ -175,6 +183,15 @@ void IKChain::Update(const Time& time)
         const sf::Vector2f newPos = endPosition + endToStart*m_links[i].length;
         m_links[i].SetStartPosition(newPos);
         if (i != 0) m_links[i-1].end = m_links[i].start;
+
+        m_links[i].worldAngle = -atan2(-endToStart.y, -endToStart.x); // Angle (CCW) from X axis to the vector startToEnd
+        if (i==0) {
+            m_links[i].localAngle = m_links[i].worldAngle;
+        } else {
+            const sf::Vector2f previousLinkEndToStart = Normalize(m_links[i-1].start.position - m_links[i-1].end.position);
+            m_links[i].localAngle = -(atan2(endToStart.y, endToStart.x) - atan2(previousLinkEndToStart.y, previousLinkEndToStart.x));
+        }
+        // Angle (CCW) from previous link to current link = PI + m_links[i].localAngle
     }
 
     // Backward pass

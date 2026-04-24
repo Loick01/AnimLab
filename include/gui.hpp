@@ -24,7 +24,7 @@ class ImGuiLayer : public Notifier<SceneType>
         unsigned int m_selectedScene;
 
     public:
-        ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor);
+        ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor, const SceneType defaultScene);
         ~ImGuiLayer();
 
         void SetElement(Element* element);

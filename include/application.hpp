@@ -22,7 +22,7 @@ class Application
         bool m_isRunning;
 
     public:
-        Application(const std::string& title, const sf::Color backgroundColor);
+        Application(const std::string& title, const sf::Color backgroundColor, const SceneType defaultScene);
 
         void SwitchScene(const SceneType e);
         void Run();

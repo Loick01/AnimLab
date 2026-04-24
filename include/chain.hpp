@@ -103,6 +103,7 @@ class Chain : public Element
         unsigned int GetNrLink() const;
         void SetOrigin(const sf::Vector2f origin);
         void SetElementGUI() override;
+        void SetAngleGUI() override;
         void AddJoint(); // Add/Remove at the end of m_links
         void RemoveJoint();
         void UpdateJointColor();

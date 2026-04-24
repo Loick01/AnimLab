@@ -30,4 +30,5 @@ class Body : public Element
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
         void Update(const Time& time) override;
         void SetElementGUI() override;
+        void SetAngleGUI() override;
 };

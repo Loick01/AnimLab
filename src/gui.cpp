@@ -1,8 +1,8 @@
 #include "gui.hpp"
 
-ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor):
+ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor, const SceneType defaultScene):
     m_renderWindow(renderWindow), m_backgroundColor(backgroundColor), 
-    m_selectedScene(2) // m_selectedScene should be initialized according to the default scene type in Application constructor
+    m_selectedScene((int)defaultScene)
 {
     if (!ImGui::SFML::Init(m_renderWindow))
         throw std::runtime_error("Failed to initialize ImGui SFML\n");
@@ -22,28 +22,40 @@ void ImGuiLayer::SetFrame(const sf::Time deltaTime)
     ImGui::SFML::Update(m_renderWindow, deltaTime);
     ImGui::Begin("AnimLab");
 
-    const char* sceneList[] = {"Forward Kinematics", "Inverse Kinematics (FABRIK)", "Body 2D"}; // Must be the same order than SceneType
+    if (ImGui::BeginTabBar("TabBar")){
+        if (ImGui::BeginTabItem("General settings")){
+            const char* sceneList[] = {"Forward Kinematics", "Inverse Kinematics (FABRIK)", "Body 2D"}; // Must be the same order than SceneType
 
-    if (ImGui::BeginCombo("Scene", sceneList[m_selectedScene])){
-        for (int i = 0; i < IM_ARRAYSIZE(sceneList); i++){
-            if (ImGui::Selectable(sceneList[i])){
-                m_selectedScene = i;
-                Notify(static_cast<SceneType>(m_selectedScene));
+            if (ImGui::BeginCombo("Scene", sceneList[m_selectedScene])){
+                for (int i = 0; i < IM_ARRAYSIZE(sceneList); i++){
+                    if (ImGui::Selectable(sceneList[i])){
+                        m_selectedScene = i;
+                        Notify(static_cast<SceneType>(m_selectedScene));
+                    }
+                }
+                ImGui::EndCombo();
             }
+
+            float bgColor[3] = {m_backgroundColor.r/255.f, m_backgroundColor.g/255.f, m_backgroundColor.b/255.f};
+            if (ImGui::ColorEdit3("Background color", bgColor)) {
+                m_backgroundColor = {
+                    static_cast<std::uint8_t>(bgColor[0]*255), 
+                    static_cast<std::uint8_t>(bgColor[1]*255),
+                    static_cast<std::uint8_t>(bgColor[2]*255)
+                };
+            }
+
+            m_element->SetElementGUI();
+            
+            ImGui::EndTabItem();
         }
-        ImGui::EndCombo();
-    }
 
-    float bgColor[3] = {m_backgroundColor.r/255.f, m_backgroundColor.g/255.f, m_backgroundColor.b/255.f};
-    if (ImGui::ColorEdit3("Background color", bgColor)) {
-        m_backgroundColor = {
-            static_cast<std::uint8_t>(bgColor[0]*255), 
-            static_cast<std::uint8_t>(bgColor[1]*255),
-            static_cast<std::uint8_t>(bgColor[2]*255)
-        };
+        if (ImGui::BeginTabItem("Angles")){
+            m_element->SetAngleGUI();
+            ImGui::EndTabItem();
+        }
     }
-
-    m_element->SetElementGUI();
+    ImGui::EndTabBar();
 
     ImGui::End();
 }

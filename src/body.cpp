@@ -66,3 +66,16 @@ void Body::SetElementGUI()
     m_rightLeg.SetElementGUI();
     ImGui::PopID();
 }
+
+void Body::SetAngleGUI() 
+{   
+    ImGui::Text("Left leg");
+    ImGui::PushID("Left");
+    m_leftLeg.SetAngleGUI();
+    ImGui::PopID();
+
+    ImGui::Text("Right leg");
+    ImGui::PushID("Right");
+    m_rightLeg.SetAngleGUI();
+    ImGui::PopID();
+}

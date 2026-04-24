@@ -13,4 +13,5 @@ class Element : public sf::Drawable
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
         virtual void Update(const Time& time) = 0;
         virtual void SetElementGUI() = 0;
+        virtual void SetAngleGUI() = 0;
 };
