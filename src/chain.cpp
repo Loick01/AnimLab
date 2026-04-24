@@ -101,6 +101,19 @@ void Chain::SetAngleGUI()
     }
 }
 
+void Chain::ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex)
+{
+    m_links[linkIndex].worldAngle = -atan2(v1.y, v1.x); // Angle (CCW) from X axis to the vector v1
+    if (linkIndex==0) {
+        m_links[linkIndex].localAngle = m_links[linkIndex].worldAngle;
+    } else {
+        const float cross = v1.x * v2.y - v1.y * v2.x;
+        const float dot = v1.x * v2.x + v1.y * v2.y;
+        m_links[linkIndex].localAngle = atan2(cross, dot); // [-PI, PI]
+    }
+    // Angle (CCW) from v2 to v1 should be PI + m_links[linkIndex].localAngle
+}
+
 FKChain::FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
     Chain(origin, nrJoint, initialLength)
 {}
@@ -184,14 +197,8 @@ void IKChain::Update(const Time& time)
         m_links[i].SetStartPosition(newPos);
         if (i != 0) m_links[i-1].end = m_links[i].start;
 
-        m_links[i].worldAngle = -atan2(-endToStart.y, -endToStart.x); // Angle (CCW) from X axis to the vector startToEnd
-        if (i==0) {
-            m_links[i].localAngle = m_links[i].worldAngle;
-        } else {
-            const sf::Vector2f previousLinkEndToStart = Normalize(m_links[i-1].start.position - m_links[i-1].end.position);
-            m_links[i].localAngle = -(atan2(endToStart.y, endToStart.x) - atan2(previousLinkEndToStart.y, previousLinkEndToStart.x));
-        }
-        // Angle (CCW) from previous link to current link = PI + m_links[i].localAngle
+        const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
+        ComputeLinkAngle(-endToStart, previousLinkStartToEnd, i);
     }
 
     // Backward pass
@@ -204,6 +211,9 @@ void IKChain::Update(const Time& time)
             const sf::Vector2f newPos = startPosition + startToEnd*m_links[i].length;
             m_links[i].SetEndPosition(newPos);
             if (i != m_links.size()-1) m_links[i+1].start = m_links[i].end;
+
+            const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
+            ComputeLinkAngle(startToEnd, previousLinkStartToEnd, i);
         }
     }
 }

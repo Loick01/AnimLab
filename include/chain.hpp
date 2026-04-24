@@ -108,6 +108,7 @@ class Chain : public Element
         void RemoveJoint();
         void UpdateJointColor();
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+        void ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex);
 };
 
 class FKChain : public Chain
