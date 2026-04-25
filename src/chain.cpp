@@ -189,6 +189,11 @@ void IKChain::Update(const Time& time)
     const unsigned int lastIndex = m_links.size()-1; // Last link index of the chain
     m_links[lastIndex].SetEndPosition(targetPosition);
 
+    // Each link will have its own constraints
+    const float constraintMin = radians(15.f);
+    const float constraintMax = radians(300.f);
+    const float epsilon = 0.01f;
+
     for (int i = lastIndex ; i >= 0 ; i--) {
         const sf::Vector2f endPosition = m_links[i].end.position;
         const sf::Vector2f startPosition = m_links[i].start.position;
@@ -198,7 +203,18 @@ void IKChain::Update(const Time& time)
         if (i != 0) m_links[i-1].end = m_links[i].start;
 
         const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
-        ComputeLinkAngle(-endToStart, previousLinkStartToEnd, i);
+        const sf::Vector2f startToEnd = -endToStart;
+        ComputeLinkAngle(startToEnd, previousLinkStartToEnd, i);
+
+        const float angle = M_PI + m_links[i].localAngle; // Angle from m_links[i-1] to m_links[i]
+        const float clamped = std::clamp(angle, constraintMin, constraintMax);
+        const float delta = clamped - angle;
+        if (abs(delta) > epsilon) { // If the angle have been clamped
+            const float cosA = cos(delta);
+            const float sinA = sin(delta);
+            const sf::Vector2f newV = {startToEnd.x * cosA - startToEnd.y * sinA, startToEnd.x * sinA + startToEnd.y * cosA};
+            m_links[i].SetEndPosition(newPos + newV * m_links[i].length);
+        }
     }
 
     // Backward pass
