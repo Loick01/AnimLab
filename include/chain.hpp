@@ -20,8 +20,9 @@ enum class TargetMode
 struct Joint
 {
     sf::Vector2f position;
-    float radius;
     sf::CircleShape circle;
+    sf::Color color;
+    float radius;
 
     Joint(const sf::Color c) : Joint(sf::Vector2f{0.,0.}, c)
     {}
@@ -29,13 +30,14 @@ struct Joint
     Joint(const sf::Vector2f p, const sf::Color c) : position(p), radius(10.f)
     {
         SetRadius(radius);
-        circle.setOrigin(radius, radius);
+        circle.setOrigin(radius, radius); // Define the center point of the shape, relative to the top-left corner (default is 0,0)
         SetColor(c);
         UpdateCirclePosition();
     }
 
     void SetColor(const sf::Color c) {
-        circle.setFillColor(c);
+        color = c;
+        circle.setFillColor(color);
     }
 
     void SetRadius(const float r) {
@@ -43,7 +45,7 @@ struct Joint
     }
 
     void UpdateCirclePosition() {
-        circle.setPosition(position.x, position.y);
+        circle.setPosition(position);
     }
 };
 
@@ -52,34 +54,34 @@ struct Link
     Joint start;
     Joint end;
     sf::Vertex line[2];
-    float worldAngle; // Sum of the angles of the parent links
-    float localAngle; // Angle of the link with the previous link of the chain
+    float angle; // Angle (CCW) from X axis to the vector of the link (start to end)
     float length;
 
-    Link(const Joint j, const sf::Color c, const float local, const float world, const float l):
-        start(j), end(c), localAngle(local), worldAngle(world), length(l) 
+    Link(const Joint j, const sf::Color c, const float initialAngle, const float l):
+        start(j), end(c), angle(initialAngle), length(l) 
     {
-        ComputeEndWithAngle();
+        ComputeEnd();
     }
 
     void SetStartPosition(const sf::Vector2f position)  {
         start.position = position;
-        line[0] = sf::Vertex(start.position, sf::Color::White);
-        line[1] = sf::Vertex(end.position, sf::Color::White);
+        line[0] = sf::Vertex(start.position, start.color);
+        line[1] = sf::Vertex(end.position, end.color);
         start.UpdateCirclePosition();
     }
 
     void SetEndPosition(const sf::Vector2f position)  {
         end.position = position;
-        line[0] = sf::Vertex(start.position, sf::Color::White);
-        line[1] = sf::Vertex(end.position, sf::Color::White);
+        line[0] = sf::Vertex(start.position, start.color);
+        line[1] = sf::Vertex(end.position, end.color);
         end.UpdateCirclePosition();
     }
 
-    void ComputeEndWithAngle() {
-        const float newX = start.position.x + cos(worldAngle + localAngle) * length; 
-        const float newY = start.position.y + sin(worldAngle + localAngle) * length;
-        SetEndPosition(sf::Vector2f{newX, newY});
+    void ComputeEnd() {
+        // I use -sin because sfml window y axis points downwards. Thus I can use CCW as positive angle
+        const float endX = start.position.x + cos(angle) * length;
+        const float endY = start.position.y - sin(angle) * length;
+        SetEndPosition(sf::Vector2f{endX, endY});
     }
 };
 
@@ -108,13 +110,16 @@ class Chain : public Element
         void RemoveJoint();
         void UpdateJointColor();
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-        void ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex);
+        // void ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex);
 };
 
 class FKChain : public Chain
 {
     private:
-        void SetAngleAt(const unsigned int index, const float newLocalAngle);
+        float m_amplitude;
+
+        void SetAngleAt(const unsigned int index, const float angle); // Unused ?
+        void AddAngleAt(const unsigned int index, const float angle);
         
     public:
         FKChain() = default;

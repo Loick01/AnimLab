@@ -32,7 +32,7 @@ void Application::SwitchScene(const SceneType e)
 {
     switch(e){
         case SceneType::FK: {
-            m_element = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 5, 40);
+            m_element = std::make_unique<FKChain>(sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()}, 10, 40);
             break;
         } 
         case SceneType::IK_FABRIK: {

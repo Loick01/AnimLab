@@ -4,15 +4,12 @@ Chain::Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsign
     m_origin(origin), m_jointColor(sf::Color::White), m_nrJoint(nrJoint), m_initialLength(initialLength) // Default joint color and initial link length will not stay here
 {
     if (nrJoint < 2) throw std::invalid_argument("A chain must have at least 2 joints\n");
-    Joint currentJoint(m_origin, m_jointColor);
-    float localAngle = -90.f; // First link only
-    float worldAngle = 0.f; 
+    Joint j(m_origin, m_jointColor);
+    float angle = 90.f;
     for (unsigned int i = 0 ; i < nrJoint-1 ; i++) {
-        Link l(currentJoint, m_jointColor, radians(localAngle), radians(worldAngle), m_initialLength);
+        Link l(j, m_jointColor, radians(angle), m_initialLength);
         m_links.push_back(l);
-        currentJoint = l.end;
-        worldAngle += localAngle;
-        localAngle = 0.f;
+        j = l.end;
     }
 }
 
@@ -54,8 +51,7 @@ void Chain::AddJoint()
 {
     const Link lastLink = m_links.back();
     const Joint lastJoint = lastLink.end;
-    const float currentAngle = lastLink.worldAngle + lastLink.localAngle;
-    Link l(lastJoint, m_jointColor, radians(0.f), radians(currentAngle), m_initialLength);
+    Link l(lastJoint, m_jointColor, radians(lastLink.angle), m_initialLength);
     m_links.push_back(l);
 }
 
@@ -97,46 +93,61 @@ void Chain::SetAngleGUI()
 {   
     for (unsigned int i = 0 ; i < m_links.size() ; i++) {
         const Link l = m_links[i];
-        ImGui::Text("Link %d : World Angle = %f / Local Angle = %f", i, degrees(l.worldAngle), degrees(l.localAngle));
+        ImGui::Text("Link %d : Angle = %f", i, degrees(l.angle));
     }
 }
 
-void Chain::ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex)
-{
-    m_links[linkIndex].worldAngle = -atan2(v1.y, v1.x); // Angle (CCW) from X axis to the vector v1
-    if (linkIndex==0) {
-        m_links[linkIndex].localAngle = m_links[linkIndex].worldAngle;
-    } else {
-        const float cross = v1.x * v2.y - v1.y * v2.x;
-        const float dot = v1.x * v2.x + v1.y * v2.y;
-        m_links[linkIndex].localAngle = atan2(cross, dot); // [-PI, PI]
-    }
-    // Angle (CCW) from v2 to v1 should be PI + m_links[linkIndex].localAngle
-}
+// void Chain::ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex)
+// {
+//     m_links[linkIndex].worldAngle = -atan2(v1.y, v1.x); 
+//     if (linkIndex==0) {
+//         m_links[linkIndex].localAngle = m_links[linkIndex].worldAngle;
+//     } else {
+//         const float cross = v1.x * v2.y - v1.y * v2.x;
+//         const float dot = v1.x * v2.x + v1.y * v2.y;
+//         m_links[linkIndex].localAngle = atan2(cross, dot); // [-PI, PI]
+//     }
+//     // Angle (CCW) from v2 to v1 should be PI + m_links[linkIndex].localAngle
+// }
 
 FKChain::FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
-    Chain(origin, nrJoint, initialLength)
+    Chain(origin, nrJoint, initialLength), m_amplitude(20.f)
 {}
 
 void FKChain::Update(const Time& time)
 {
-    const float mappedValue = sin(time.GetElapsedTime())*8; // [-8; 8]
+    // SetAngleAt(1, radians(sin(time.GetElapsedTime())));
+    const float value = sin(time.GetElapsedTime()+M_PI/2.)*m_amplitude;
     for (unsigned int i = 1 ; i < GetNrLink() ; i++)
-        SetAngleAt(i, radians(mappedValue));
+        AddAngleAt(i, radians(value)*time.GetDeltaTime().asSeconds());
 }
 
-void FKChain::SetAngleAt(const unsigned int index, const float newLocalAngle)
+
+void FKChain::SetAngleAt(const unsigned int index, const float angle)
 {
     if (index >= m_links.size()) throw std::invalid_argument("Index is greater than m_links\n");
-    m_links[index].localAngle = newLocalAngle;
-    m_links[index].ComputeEndWithAngle();
+    const float deltaAngle = angle - m_links[index].angle;
     unsigned int currentIndex = index;
-    float worldAngle = m_links[index].worldAngle + m_links[index].localAngle; 
+    m_links[index].angle = angle;
+    m_links[index].ComputeEnd();
     for (unsigned int i = index+1 ; i < m_links.size() ; i++){
         m_links[i].start = m_links[currentIndex].end;
-        m_links[i].worldAngle = worldAngle;
-        m_links[i].ComputeEndWithAngle();
-        worldAngle += m_links[i].localAngle;
+        m_links[i].angle += deltaAngle;
+        m_links[i].ComputeEnd();
+        currentIndex = i;
+    }
+}
+
+void FKChain::AddAngleAt(const unsigned int index, const float angle)
+{
+    if (index >= m_links.size()) throw std::invalid_argument("Index is greater than m_links\n");
+    unsigned int currentIndex = index;
+    m_links[index].angle += angle;
+    m_links[index].ComputeEnd();
+    for (unsigned int i = index+1 ; i < m_links.size() ; i++){
+        m_links[i].start = m_links[currentIndex].end;
+        m_links[i].angle += angle;
+        m_links[i].ComputeEnd();
         currentIndex = i;
     }
 }
@@ -144,7 +155,8 @@ void FKChain::SetAngleAt(const unsigned int index, const float newLocalAngle)
 void FKChain::SetElementGUI()
 {
     Chain::SetElementGUI();
-    // Nothing yet
+    
+    ImGui::SliderFloat("Amplitude", &m_amplitude, 1.f, 50.f);
 }
 
 IKChain::IKChain(const TargetMode targetMode, const unsigned int nrJoint, const unsigned int initialLength, 
@@ -202,19 +214,19 @@ void IKChain::Update(const Time& time)
         m_links[i].SetStartPosition(newPos);
         if (i != 0) m_links[i-1].end = m_links[i].start;
 
-        const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
-        const sf::Vector2f startToEnd = -endToStart;
-        ComputeLinkAngle(startToEnd, previousLinkStartToEnd, i);
+        // const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
+        // const sf::Vector2f startToEnd = -endToStart;
+        // ComputeLinkAngle(startToEnd, previousLinkStartToEnd, i);
 
-        const float angle = M_PI + m_links[i].localAngle; // Angle from m_links[i-1] to m_links[i]
-        const float clamped = std::clamp(angle, constraintMin, constraintMax);
-        const float delta = clamped - angle;
-        if (abs(delta) > epsilon) { // If the angle have been clamped
-            const float cosA = cos(delta);
-            const float sinA = sin(delta);
-            const sf::Vector2f newV = {startToEnd.x * cosA - startToEnd.y * sinA, startToEnd.x * sinA + startToEnd.y * cosA};
-            m_links[i].SetEndPosition(newPos + newV * m_links[i].length);
-        }
+        // const float angle = M_PI + m_links[i].localAngle; // Angle from m_links[i-1] to m_links[i]
+        // const float clamped = std::clamp(angle, constraintMin, constraintMax);
+        // const float delta = clamped - angle;
+        // if (abs(delta) > epsilon) { // If the angle have been clamped
+        //     const float cosA = cos(delta);
+        //     const float sinA = sin(delta);
+        //     const sf::Vector2f newV = {startToEnd.x * cosA - startToEnd.y * sinA, startToEnd.x * sinA + startToEnd.y * cosA};
+        //     m_links[i].SetEndPosition(newPos + newV * m_links[i].length);
+        // }
     }
 
     // Backward pass
@@ -228,8 +240,8 @@ void IKChain::Update(const Time& time)
             m_links[i].SetEndPosition(newPos);
             if (i != m_links.size()-1) m_links[i+1].start = m_links[i].end;
 
-            const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
-            ComputeLinkAngle(startToEnd, previousLinkStartToEnd, i);
+            // const sf::Vector2f previousLinkStartToEnd = m_links[i-1].end.position - m_links[i-1].start.position; // Can't normalize 
+            // ComputeLinkAngle(startToEnd, previousLinkStartToEnd, i);
         }
     }
 }
