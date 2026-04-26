@@ -63,6 +63,10 @@ struct Link
         ComputeEnd();
     }
 
+    sf::Vector2f GetDirection() const {
+        return GetNormalized(end.position - start.position);
+    }
+
     void SetStartPosition(const sf::Vector2f position)  {
         start.position = position;
         line[0] = sf::Vertex(start.position, start.color);
@@ -83,6 +87,10 @@ struct Link
         const float endY = start.position.y - sin(angle) * length;
         SetEndPosition(sf::Vector2f{endX, endY});
     }
+
+    void ComputeAngle() {
+        // angle = atan2();
+    }
 };
 
 class Chain : public Element
@@ -99,8 +107,6 @@ class Chain : public Element
         virtual ~Chain() = default;
         Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
 
-        static sf::Vector2f Normalize(const sf::Vector2f v);
-
         sf::Color GetColor() const;
         unsigned int GetNrLink() const;
         void SetOrigin(const sf::Vector2f origin);
@@ -110,7 +116,6 @@ class Chain : public Element
         void RemoveJoint();
         void UpdateJointColor();
         void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
-        // void ComputeLinkAngle(const sf::Vector2f v1, const sf::Vector2f v2, const unsigned int linkIndex);
 };
 
 class FKChain : public Chain

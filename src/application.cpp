@@ -36,7 +36,7 @@ void Application::SwitchScene(const SceneType e)
             break;
         } 
         case SceneType::IK_FABRIK: {
-            m_element = std::make_unique<IKChain>(TargetMode::Rotating, 5, 40, &m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()});
+            m_element = std::make_unique<IKChain>(TargetMode::Rotating, 10, 40, &m_eventController, sf::Vector2f{m_window.GetWidth()/2, m_window.GetHeight()});
             break;
         }
         case SceneType::BODY_2D: {
