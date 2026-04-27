@@ -123,7 +123,8 @@ class FKChain : public Chain
     private:
         float m_amplitude;
 
-        void SetAngleAt(const unsigned int index, const float angle); // Unused ?
+        // Should be in Chain ?
+        void SetAngleAt(const unsigned int index, const float angle);
         void AddAngleAt(const unsigned int index, const float angle);
         
     public:

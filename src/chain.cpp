@@ -181,13 +181,13 @@ void IKChain::Update(const Time& time)
     m_links[lastIndex].SetEndPosition(targetPosition);
 
     // Each link will have its own constraints
-    // const float constraintMin = radians(15.f);
-    // const float constraintMax = radians(300.f);
-    // const float epsilon = 0.01f;
+    const float constraintMin = radians(-100.f); // [-PI, PI]
+    const float constraintMax = radians(100.f); // [-PI, PI]
+    const float epsilon = 0.01f;
 
     for (int i = lastIndex ; i >= 0 ; i--) {
         const sf::Vector2f linkEnd = m_links[i].end.position;
-        const sf::Vector2f direction = m_links[i].GetDirection();
+        const sf::Vector2f direction = m_links[i].GetDirection(); // Normalized
         const sf::Vector2f newPos = linkEnd - direction * m_links[i].length;
         m_links[i].SetStartPosition(newPos);
         if (i != 0) m_links[i-1].end = m_links[i].start;
@@ -195,26 +195,28 @@ void IKChain::Update(const Time& time)
         m_links[i].angle = ComputeAngle(direction);
         float a = 0.f;
         if (i == 0) {
-            a = m_links[i].angle;
+            a = m_links[i].angle; // Use the angle with the X axis
         } else {
-            const sf::Vector2f pld = -m_links[i-1].GetDirection(); // Previous link reversed direction
-            const float cross = pld.x * direction.y - pld.y * direction.x;
-            const float dot = pld.x * direction.x + pld.y * direction.y;
-            a = -atan2(cross, dot); // Angle CCW ([-PI, PI]) from previous link (i-1) to current link (i)
+            const sf::Vector2f parentDirection = m_links[i-1].GetDirection(); // Previous link direction (normalized)
+            const float cross = parentDirection.x * direction.y - parentDirection.y * direction.x;
+            const float dot = parentDirection.x * direction.x + parentDirection.y * direction.y;
+            a = -atan2(cross, dot); // Angle CCW ([-PI, PI]) from parent link (i-1) to child link (i)
         }
 
-        if (a < 0.) { a += 2 * M_PI; } // [0, 2PI]
+        // if (a < 0.) { a += 2 * M_PI; } // [0, 2PI]
         m_links[i].angle = a; // Will be removed
 
-        // const float angle = M_PI + m_links[i].localAngle; // Angle from m_links[i-1] to m_links[i]
-        // const float clamped = std::clamp(angle, constraintMin, constraintMax);
-        // const float delta = clamped - angle;
-        // if (abs(delta) > epsilon) { // If the angle have been clamped
-        //     const float cosA = cos(delta);
-        //     const float sinA = sin(delta);
-        //     const sf::Vector2f newV = {startToEnd.x * cosA - startToEnd.y * sinA, startToEnd.x * sinA + startToEnd.y * cosA};
-        //     m_links[i].SetEndPosition(newPos + newV * m_links[i].length);
-        // }
+        const float clamped = std::clamp(a, constraintMin, constraintMax);
+        const float delta = clamped - a;
+        if (fabs(delta) > epsilon) { // If the angle have been clamped
+            // AddAngleAt(i, delta); ?
+            
+            // const float cosA = cos(delta);
+            // const float sinA = sin(delta);
+            // const sf::Vector2f newV = {direction.x * cosA - direction.y * sinA, direction.x * sinA + direction.y * cosA};
+            // m_links[i].SetEndPosition(newPos + newV * m_links[i].length);
+            // if (i != m_links.size()-1) m_links[i+1].start = m_links[i].end;
+        }
     }
 
     // Backward pass

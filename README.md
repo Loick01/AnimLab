@@ -12,10 +12,17 @@
       <br>
       <strong>Forward Kinematics</strong>
     </td>
+  </tr>
+  <tr>
     <td align="center">
       <img src="./screenshot/ik2.gif" height="330"/>
       <br>
       <strong>IK (without the backward pass)</strong>
+    </td>
+    <td align="center">
+      <img src="./screenshot/body_v1.gif" height="330"/>
+      <br>
+      <strong>Legs animation (without angle constraints for now)</strong>
     </td>
   </tr>
 </table>
@@ -35,6 +42,7 @@ make
 
 + **Mouse :** Move the target position used for Inverse Kinematics (if the option is enabled in ImGui)
 + **Escape :** Close the window
++ **Arrow keys :** Move the Element in the BODY_2D scene
 
 ### ImGui window
 
@@ -57,6 +65,17 @@ make
       <strong>Aim mouse cursor :</strong> Target position used for IK is the mouse position<br>
       <strong>Compute target with elapsed time :</strong> Target position used for IK is computed automatically to move along a circle<br>
       <strong>Perform backward pass :</strong> Enable the backward pass in the IK algorithm. If disabled, the chain will not be fixed to its origin<br>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <img src="./screenshot/imgui_body.png" width="500px">
+    </td>
+    <td style="padding-left: 15px;">
+      <strong>Speed :</strong> Speed of the body<br>
+      <strong>Distance threshold :</strong> When the distance between the current and next leg target exceeds this threshold, the leg starts lifting<br>
+      <strong>Height when lifting :</strong> During the lifting animation, the target will move along a semi-elliptical trajectory with this height<br>
+      <strong>Lifting speed :</strong> Speed of the lifting animation<br>
     </td>
   </tr>
 </table>
