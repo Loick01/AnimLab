@@ -39,7 +39,7 @@ void Leg::Update(const Time& time)
         }
         case State::Lift : {
             if (m_anim.t >= 1.0) {
-                SetCurrentTarget(m_nextTarget);
+                SetCurrentTarget(sf::Vector2f{m_anim.endX, m_nextTarget.y});
                 m_state = State::Rest;
                 m_anim.t = 0.f;
             } else {
@@ -58,7 +58,7 @@ void Leg::Update(const Time& time)
 
 void Leg::SetElementGUI() 
 {
-    ImGui::SliderFloat("Distance threshold", &m_distanceThreshold, 0.f, 100.f);
+    ImGui::SliderFloat("Distance threshold", &m_distanceThreshold, 10.f, 200.f);
     ImGui::SliderFloat("Height when lifting", &m_anim.height, 0.f, 100.f);
     ImGui::SliderFloat("Lifting speed", &m_anim.speed, 0.01f, 10.f);
 }

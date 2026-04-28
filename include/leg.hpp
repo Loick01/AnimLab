@@ -17,7 +17,7 @@ struct LegAnimation
 
     LegAnimation(const float h) {
         t = 0.f;
-        speed = 8.f;
+        speed = 5.f;
         height = h; 
     }
 };
