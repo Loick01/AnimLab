@@ -1,5 +1,11 @@
 #include "gui.hpp"
 
+#include <stdexcept>
+
+#include "element.hpp"
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 ImGuiLayer::ImGuiLayer(sf::RenderWindow& renderWindow, sf::Color& backgroundColor, const SceneType defaultScene):
     m_renderWindow(renderWindow), m_backgroundColor(backgroundColor), 
     m_selectedScene((int)defaultScene)

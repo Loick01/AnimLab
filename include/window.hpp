@@ -1,7 +1,8 @@
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
 #include <string>
+
+#include <SFML/Graphics/RenderWindow.hpp>
 
 class Window
 {

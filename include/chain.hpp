@@ -1,16 +1,13 @@
 #pragma once
 
-#include <cmath>
-#include <stdexcept>
 #include <vector>
 
 #include <SFML/Graphics/CircleShape.hpp>
 
 #include "element.hpp"
-#include "event.hpp"
-#include "imgui.h"
-#include "imgui-SFML.h"
 #include "type.hpp"
+
+class EventController;
 
 enum class TargetMode
 {

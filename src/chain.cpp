@@ -1,5 +1,12 @@
 #include "chain.hpp"
 
+#include <cmath>
+#include <stdexcept>
+
+#include "event.hpp"
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 Chain::Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
     m_origin(origin), m_jointColor(sf::Color::White), m_nrJoint(nrJoint), m_initialLength(initialLength) // Default joint color and initial link length will not stay here
 {

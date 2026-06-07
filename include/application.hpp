@@ -2,8 +2,6 @@
 
 #include <memory>
 
-#include "body.hpp"
-#include "chain.hpp"
 #include "element.hpp"
 #include "event.hpp"
 #include "gui.hpp"

@@ -3,8 +3,9 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 
 #include "element.hpp"
-#include "event.hpp"
 #include "leg.hpp"
+
+class EventController;
 
 class Body : public Element
 {

@@ -1,5 +1,9 @@
 #include "body.hpp"
 
+#include "event.hpp"
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 Body::Body(const EventController& eventController, const sf::Vector2f chestSize, const sf::Vector2f bodyPosition, const float floorHeight, 
 const unsigned int nrLegJoint, const unsigned int linkLength) :
     m_leftLeg(TargetMode::Walking, nrLegJoint, linkLength, State::Rest),

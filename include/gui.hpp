@@ -2,13 +2,10 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Event.hpp>
-#include <stdexcept>
 
-#include "imgui.h"
-#include "imgui-SFML.h"
-
-#include "element.hpp"
 #include "notifier.hpp"
+
+class Element;
 
 enum class SceneType
 {

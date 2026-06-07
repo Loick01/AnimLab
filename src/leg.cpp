@@ -1,10 +1,11 @@
 #include "leg.hpp"
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 Leg::Leg(const TargetMode targetMode, const unsigned int nrJoint, const unsigned int initialLength, State initialState):
     IKChain(targetMode, nrJoint, initialLength), m_state(initialState), m_distanceThreshold(75.f), m_anim(20.f)
-{
-    
-}
+{}
 
 sf::Vector2f Leg::GetNextTarget() const
 {

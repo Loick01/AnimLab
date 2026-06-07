@@ -1,5 +1,8 @@
 #include "application.hpp"
 
+#include "body.hpp"
+#include "chain.hpp"
+
 Application::Application(const std::string& title, const sf::Color backgroundColor, const SceneType defaultScene):
     m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), 
     m_gui(m_window.GetRender(), m_window.GetBackgroundColor(), defaultScene)

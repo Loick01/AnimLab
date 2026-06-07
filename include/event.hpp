@@ -4,10 +4,7 @@
 #include <SFML/Window/Event.hpp>
 #include <vector>
 
-enum class Direction
-{
-    Right, Left, None
-};
+#include "type.hpp"
 
 class EventController
 {
