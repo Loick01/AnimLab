@@ -18,6 +18,7 @@ class Application
         std::unique_ptr<Element> m_element;
         Time m_time;
         bool m_isRunning;
+        bool m_isPaused;
 
     public:
         Application(const std::string& title, const sf::Color backgroundColor, const SceneType defaultScene);

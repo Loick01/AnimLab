@@ -12,7 +12,7 @@ Chain::Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsign
 {
     if (nrJoint < 2) throw std::invalid_argument("A chain must have at least 2 joints\n");
     Joint j(m_origin, m_jointColor);
-    float angle = 90.f;
+    float angle = 90.f; // In degrees
     for (unsigned int i = 0 ; i < nrJoint-1 ; i++) {
         Link l(j, m_jointColor, radians(angle), m_initialLength);
         m_links.push_back(l);
@@ -20,44 +20,9 @@ Chain::Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsign
     }
 }
 
-sf::Color Chain::GetColor() const
-{
-    return m_jointColor;
-}
-
 unsigned int Chain::GetNrLink() const
 {
     return m_links.size();
-}
-
-void Chain::UpdateJointColor()
-{
-    for (Link& l : m_links) { // Update joints with the same color (later every joint will have his own color)
-        l.start.SetColor(m_jointColor);
-        l.end.SetColor(m_jointColor);
-    }
-}
-
-void Chain::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
-    for (const Link& l : m_links) {
-        target.draw(l.start.circle, states);
-        target.draw(l.end.circle, states);
-        target.draw(l.line, 2, sf::Lines);
-    }
-}
-
-void Chain::AddJoint()
-{
-    const Link lastLink = m_links.back();
-    const Joint lastJoint = lastLink.end;
-    Link l(lastJoint, m_jointColor, radians(lastLink.angle), m_initialLength);
-    m_links.push_back(l);
-}
-
-void Chain::RemoveJoint()
-{
-    m_links.pop_back();
 }
 
 void Chain::SetOrigin(const sf::Vector2f origin)
@@ -79,11 +44,11 @@ void Chain::SetElementGUI()
     }
 
     float c[3] = {m_jointColor.r/255.f, m_jointColor.g/255.f, m_jointColor.b/255.f};
-    if (ImGui::ColorEdit3("Joint color", c)) {
+    if (ImGui::ColorEdit3("Chain color", c)) {
         m_jointColor = {
-            static_cast<std::uint8_t>(c[0]*255), 
-            static_cast<std::uint8_t>(c[1]*255),
-            static_cast<std::uint8_t>(c[2]*255)
+            static_cast<std::uint8_t>(c[0]*255.f), 
+            static_cast<std::uint8_t>(c[1]*255.f),
+            static_cast<std::uint8_t>(c[2]*255.f)
         };
         UpdateJointColor();
     }
@@ -97,6 +62,37 @@ void Chain::SetAngleGUI()
     }
 }
 
+void Chain::AddJoint()
+{
+    const Link lastLink = m_links.back();
+    const Joint lastJoint = lastLink.end;
+    Link l(lastJoint, m_jointColor, lastLink.angle, m_initialLength); // lastLink.angle is already in radians
+    m_links.push_back(l);
+}
+
+void Chain::RemoveJoint()
+{
+    m_links.pop_back();
+}
+
+void Chain::UpdateJointColor()
+{
+    for (Link& l : m_links) { // Update joints with the same color (later every joint will have his own color)
+        l.start.SetColor(m_jointColor);
+        l.end.SetColor(m_jointColor);
+        l.UpdateLine(); // Update the color of the current link
+    }
+}
+
+void Chain::draw(sf::RenderTarget& target, sf::RenderStates states) const
+{
+    for (const Link& l : m_links) {
+        target.draw(l.start.circle, states);
+        target.draw(l.end.circle, states);
+        target.draw(l.line, 2, sf::Lines);
+    }
+}
+
 FKChain::FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength):
     Chain(origin, nrJoint, initialLength), m_amplitude(20.f)
 {}
@@ -107,7 +103,6 @@ void FKChain::Update(const Time& time)
     for (unsigned int i = 1 ; i < GetNrLink() ; i++)
         AddAngleAt(i, radians(value)*time.GetDeltaTime().asSeconds());
 }
-
 
 void FKChain::SetAngleAt(const unsigned int index, const float angle)
 {

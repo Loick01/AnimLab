@@ -5,7 +5,7 @@
 
 Application::Application(const std::string& title, const sf::Color backgroundColor, const SceneType defaultScene):
     m_window(title, backgroundColor), m_isRunning(true), m_eventController(m_window.GetRender()), 
-    m_gui(m_window.GetRender(), m_window.GetBackgroundColor(), defaultScene)
+    m_gui(m_window.GetRender(), m_window.GetBackgroundColor(), defaultScene), m_isPaused(false)
 {
     SwitchScene(defaultScene);
     m_gui.AddCallback([this](SceneType e){SwitchScene(e);});
@@ -14,17 +14,19 @@ Application::Application(const std::string& title, const sf::Color backgroundCol
 void Application::Run()
 {   
     while (m_isRunning) {
-        m_time.Update();
         m_eventController.PollEvents(m_window.GetRender());
         m_isRunning = m_eventController.HandleWindowEvents();
-        m_eventController.HandleEvents();
+        m_eventController.HandleEvents(m_isPaused);
         m_gui.HandleEvents(m_eventController.GetEvents());
-        
+        m_time.Update();
         m_window.ClearBackground();
-        m_window.Draw(*m_element);
-        m_element->Update(m_time);
         m_gui.SetFrame(m_time.GetDeltaTime());
         m_gui.Draw();
+        m_window.Draw(*m_element);
+        
+        if (!m_isPaused)
+            m_element->Update(m_time); // I should not use the same Time instance than the one used for m_gui.SetFrame()
+
         m_window.Display();
     }
     

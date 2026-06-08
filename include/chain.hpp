@@ -51,8 +51,8 @@ struct Link
     Joint start;
     Joint end;
     sf::Vertex line[2];
-    float angle; // Angle (CCW) from X axis to the vector of the link (start to end)
-    float length;
+    float angle; // Angle (CCW) in radians from X axis to the vector of the link (start to end)
+    const float length; // const ?
 
     Link(const Joint j, const sf::Color c, const float initialAngle, const float l):
         start(j), end(c), angle(initialAngle), length(l) 
@@ -61,20 +61,23 @@ struct Link
     }
 
     sf::Vector2f GetDirection() const {
-        return GetNormalized(end.position - start.position);
+        return Normalize(end.position - start.position);
+    }
+
+    void UpdateLine() {
+        line[0] = sf::Vertex(start.position, start.color);
+        line[1] = sf::Vertex(end.position, end.color);
     }
 
     void SetStartPosition(const sf::Vector2f position)  {
         start.position = position;
-        line[0] = sf::Vertex(start.position, start.color);
-        line[1] = sf::Vertex(end.position, end.color);
+        UpdateLine();
         start.UpdateCirclePosition();
     }
 
     void SetEndPosition(const sf::Vector2f position)  {
         end.position = position;
-        line[0] = sf::Vertex(start.position, start.color);
-        line[1] = sf::Vertex(end.position, end.color);
+        UpdateLine();
         end.UpdateCirclePosition();
     }
 
@@ -90,7 +93,7 @@ struct Link
     }
 };
 
-class Chain : public Element
+class Chain : public Element // Chain is abstract, no override of Element::Update()
 {
     protected:
         sf::Vector2f m_origin;
@@ -101,10 +104,9 @@ class Chain : public Element
 
     public:
         Chain() = default;
-        virtual ~Chain() = default;
         Chain(const sf::Vector2f origin, const unsigned int nrJoint, const unsigned int initialLength);
+        virtual ~Chain() = default;
 
-        sf::Color GetColor() const;
         unsigned int GetNrLink() const;
         void SetOrigin(const sf::Vector2f origin);
         void SetElementGUI() override;
@@ -112,7 +114,7 @@ class Chain : public Element
         void AddJoint(); // Add/Remove at the end of m_links
         void RemoveJoint();
         void UpdateJointColor();
-        void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+        void draw(sf::RenderTarget& target, sf::RenderStates states) const override; // Virtual function in sf::Drawable
 };
 
 class FKChain : public Chain

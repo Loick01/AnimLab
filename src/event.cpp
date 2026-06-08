@@ -38,7 +38,7 @@ void EventController::PollEvents(sf::RenderWindow& renderWindow)
         m_events.push_back(event);
 }
 
-void EventController::HandleEvents()
+void EventController::HandleEvents(bool& isPaused)
 {   
     for (const sf::Event event : m_events) {
         switch(event.type) {
@@ -51,6 +51,8 @@ void EventController::HandleEvents()
                     m_eventDirection = Direction::Left;
                 else if (event.key.code == sf::Keyboard::Right)
                     m_eventDirection = Direction::Right;
+                else if (event.key.code == sf::Keyboard::Space)
+                    isPaused = !isPaused;
                 break;
             }
             case sf::Event::KeyReleased :

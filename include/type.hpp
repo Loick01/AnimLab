@@ -19,7 +19,7 @@ inline float Length(const sf::Vector2f v) {
     return sqrt(v.x*v.x + v.y*v.y);
 }
 
-inline sf::Vector2f GetNormalized(const sf::Vector2f v) {
+inline sf::Vector2f Normalize(const sf::Vector2f v) {
     const float norm = std::sqrt(v.x*v.x+v.y*v.y);
     if (norm == 0) throw std::runtime_error("Vector length should not be null\n");
     return v/norm;
