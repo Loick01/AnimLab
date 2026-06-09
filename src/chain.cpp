@@ -100,37 +100,36 @@ FKChain::FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const un
 void FKChain::Update(const Time& time)
 {
     const float value = sin(time.GetCountTime()+M_PI/2.)*m_amplitude;
-    for (unsigned int i = 1 ; i < GetNrLink() ; i++)
+    for (unsigned int i = 0 ; i < GetNrLink() ; i++)
         AddAngleAt(i, radians(value)*time.GetDeltaTime().asSeconds());
 }
 
-void FKChain::SetAngleAt(const unsigned int index, const float angle)
+void FKChain::PropagateAngleFrom(const unsigned int index, const float angle)
 {
-    if (index >= m_links.size()) throw std::invalid_argument("Index is greater than m_links\n");
-    const float deltaAngle = angle - m_links[index].angle;
     unsigned int currentIndex = index;
-    m_links[index].angle = angle;
-    m_links[index].ComputeEnd();
-    for (unsigned int i = index+1 ; i < m_links.size() ; i++){
-        m_links[i].start = m_links[currentIndex].end;
-        m_links[i].angle += deltaAngle;
-        m_links[i].ComputeEnd();
-        currentIndex = i;
-    }
-}
-
-void FKChain::AddAngleAt(const unsigned int index, const float angle)
-{
-    if (index >= m_links.size()) throw std::invalid_argument("Index is greater than m_links\n");
-    unsigned int currentIndex = index;
-    m_links[index].angle += angle;
-    m_links[index].ComputeEnd();
     for (unsigned int i = index+1 ; i < m_links.size() ; i++){
         m_links[i].start = m_links[currentIndex].end;
         m_links[i].angle += angle;
         m_links[i].ComputeEnd();
         currentIndex = i;
     }
+}
+
+void FKChain::SetAngleAt(const unsigned int index, const float angle)
+{
+    if (index >= m_links.size()) throw std::invalid_argument("Index is greater than m_links\n");
+    const float deltaAngle = angle - m_links[index].angle;
+    m_links[index].angle = angle;
+    m_links[index].ComputeEnd();
+    PropagateAngleFrom(index, deltaAngle);
+}
+
+void FKChain::AddAngleAt(const unsigned int index, const float angle)
+{
+    if (index >= m_links.size()) throw std::invalid_argument("Index is greater than m_links\n");
+    m_links[index].angle += angle;
+    m_links[index].ComputeEnd();
+    PropagateAngleFrom(index, angle);
 }
 
 void FKChain::SetElementGUI()
@@ -194,20 +193,22 @@ void IKChain::Update(const Time& time)
         m_links[i].SetStartPosition(newPos);
         if (i != 0) m_links[i-1].end = m_links[i].start;
 
-        m_links[i].angle = ComputeAngle(direction);
-        float a = 0.f;
-        if (i == 0) {
-            a = m_links[i].angle; // Use the angle with the X axis
-        } else {
-            const sf::Vector2f parentDirection = m_links[i-1].GetDirection(); // Previous link direction (normalized)
-            const float cross = parentDirection.x * direction.y - parentDirection.y * direction.x;
-            const float dot = parentDirection.x * direction.x + parentDirection.y * direction.y;
-            a = -atan2(cross, dot); // Angle CCW ([-PI, PI]) from parent link (i-1) to child link (i)
-        }
+        // m_links[i].angle = ComputeAngle(direction);
+        
+        // Will be removed
+        // float a = 0.f;
+        // if (i == 0) {
+        //     a = m_links[i].angle; // Use the angle with the X axis
+        // } else {
+        //     const sf::Vector2f parentDirection = m_links[i-1].GetDirection(); // Previous link direction (normalized)
+        //     const float cross = parentDirection.x * direction.y - parentDirection.y * direction.x;
+        //     const float dot = parentDirection.x * direction.x + parentDirection.y * direction.y;
+        //     a = -atan2(cross, dot); // Angle CCW ([-PI, PI]) from parent link (i-1) to child link (i)
+        // }
+        // // if (a < 0.) { a += 2 * M_PI; } // [0, 2PI]
+        // m_links[i].angle = a;
 
-        // if (a < 0.) { a += 2 * M_PI; } // [0, 2PI]
-        m_links[i].angle = a; // Will be removed
-
+        /*
         const float clamped = std::clamp(a, constraintMin, constraintMax);
         const float delta = clamped - a;
         if (fabs(delta) > epsilon) { // If the angle have been clamped
@@ -218,7 +219,7 @@ void IKChain::Update(const Time& time)
             // const sf::Vector2f newV = {direction.x * cosA - direction.y * sinA, direction.x * sinA + direction.y * cosA};
             // m_links[i].SetEndPosition(newPos + newV * m_links[i].length);
             // if (i != m_links.size()-1) m_links[i+1].start = m_links[i].end;
-        }
+        } */
     }
 
     // Backward pass
@@ -231,7 +232,7 @@ void IKChain::Update(const Time& time)
             m_links[i].SetEndPosition(newPos);
             if (i != m_links.size()-1) m_links[i+1].start = m_links[i].end;
 
-            // m_links[i].angle = ComputeAngle(direction);
+            m_links[i].angle = ComputeAngle(direction);
         }
     }
 }

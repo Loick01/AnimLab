@@ -87,10 +87,6 @@ struct Link
         const float endY = start.position.y - sin(angle) * length;
         SetEndPosition(sf::Vector2f{endX, endY});
     }
-
-    void ComputeAngle() {
-        // angle = atan2();
-    }
 };
 
 class Chain : public Element // Chain is abstract, no override of Element::Update()
@@ -123,6 +119,7 @@ class FKChain : public Chain
         float m_amplitude;
 
         // Should be in Chain ?
+        void PropagateAngleFrom(const unsigned int index, const float angle);
         void SetAngleAt(const unsigned int index, const float angle);
         void AddAngleAt(const unsigned int index, const float angle);
         
