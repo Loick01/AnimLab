@@ -1,5 +1,7 @@
 #include "event.hpp"
 
+#include "time.hpp"
+
 EventController::EventController(sf::RenderWindow& renderWindow):
     m_mousePosition(sf::Mouse::getPosition(renderWindow)), m_eventDirection(Direction::None)
 {}
@@ -38,7 +40,7 @@ void EventController::PollEvents(sf::RenderWindow& renderWindow)
         m_events.push_back(event);
 }
 
-void EventController::HandleEvents(bool& isPaused)
+void EventController::HandleEvents(bool& isPaused, Time& time)
 {   
     for (const sf::Event event : m_events) {
         switch(event.type) {
@@ -51,8 +53,10 @@ void EventController::HandleEvents(bool& isPaused)
                     m_eventDirection = Direction::Left;
                 else if (event.key.code == sf::Keyboard::Right)
                     m_eventDirection = Direction::Right;
-                else if (event.key.code == sf::Keyboard::Space)
+                else if (event.key.code == sf::Keyboard::Space) {
                     isPaused = !isPaused;
+                    if (!isPaused) time.Reset(); // When leaving pause, this Time must be reset
+                }
                 break;
             }
             case sf::Event::KeyReleased :

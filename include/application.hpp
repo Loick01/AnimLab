@@ -16,7 +16,8 @@ class Application
         EventController m_eventController;
         ImGuiLayer m_gui;
         std::unique_ptr<Element> m_element;
-        Time m_time;
+        Time m_globalTime;
+        Time m_elementTime;
         bool m_isRunning;
         bool m_isPaused;
 

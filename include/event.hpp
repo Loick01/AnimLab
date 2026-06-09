@@ -6,6 +6,8 @@
 
 #include "type.hpp"
 
+class Time; 
+
 class EventController
 {
     private:
@@ -21,5 +23,5 @@ class EventController
         sf::Vector2i GetMousePosition() const;
         bool HandleWindowEvents();
         void PollEvents(sf::RenderWindow& renderWindow); // Should be in Window class ?
-        void HandleEvents(bool& isPaused);
+        void HandleEvents(bool& isPaused, Time& time);
 };

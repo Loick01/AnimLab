@@ -99,7 +99,7 @@ FKChain::FKChain(const sf::Vector2f origin, const unsigned int nrJoint, const un
 
 void FKChain::Update(const Time& time)
 {
-    const float value = sin(time.GetElapsedTime()+M_PI/2.)*m_amplitude;
+    const float value = sin(time.GetCountTime()+M_PI/2.)*m_amplitude;
     for (unsigned int i = 1 ; i < GetNrLink() ; i++)
         AddAngleAt(i, radians(value)*time.GetDeltaTime().asSeconds());
 }
@@ -176,7 +176,7 @@ void IKChain::SetCurrentTarget(const sf::Vector2f target)
 
 void IKChain::Update(const Time& time)
 {
-    sf::Vector2f targetPosition = GetTargetPosition(time.GetElapsedTime());
+    sf::Vector2f targetPosition = GetTargetPosition(time.GetCountTime());
     
     // Forward pass
     const unsigned int lastIndex = m_links.size()-1; // Last link index of the chain

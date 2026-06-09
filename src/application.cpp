@@ -16,16 +16,18 @@ void Application::Run()
     while (m_isRunning) {
         m_eventController.PollEvents(m_window.GetRender());
         m_isRunning = m_eventController.HandleWindowEvents();
-        m_eventController.HandleEvents(m_isPaused);
+        m_eventController.HandleEvents(m_isPaused, m_elementTime);
         m_gui.HandleEvents(m_eventController.GetEvents());
-        m_time.Update();
+        m_globalTime.Update();
         m_window.ClearBackground();
-        m_gui.SetFrame(m_time.GetDeltaTime());
+        m_gui.SetFrame(m_globalTime.GetDeltaTime());
         m_gui.Draw();
         m_window.Draw(*m_element);
         
-        if (!m_isPaused)
-            m_element->Update(m_time); // I should not use the same Time instance than the one used for m_gui.SetFrame()
+        if (!m_isPaused) {
+            m_elementTime.Update();
+            m_element->Update(m_elementTime);
+        }
 
         m_window.Display();
     }
