@@ -177,14 +177,14 @@ void IKChain::Update(const Time& time)
 {
     sf::Vector2f targetPosition = GetTargetPosition(time.GetCountTime());
     
-    // Forward pass
+    // Forward pass (end effector to root)
     const unsigned int lastIndex = m_links.size()-1; // Last link index of the chain
     m_links[lastIndex].SetEndPosition(targetPosition);
 
     // Each link will have its own constraints
-    const float constraintMin = radians(-100.f); // [-PI, PI]
-    const float constraintMax = radians(100.f); // [-PI, PI]
-    const float epsilon = 0.01f;
+    // const float constraintMin = radians(-100.f); // [-PI, PI]
+    // const float constraintMax = radians(100.f); // [-PI, PI]
+    // const float epsilon = 0.01f;
 
     for (int i = lastIndex ; i >= 0 ; i--) {
         const sf::Vector2f linkEnd = m_links[i].end.position;
@@ -192,21 +192,27 @@ void IKChain::Update(const Time& time)
         const sf::Vector2f newPos = linkEnd - direction * m_links[i].length;
         m_links[i].SetStartPosition(newPos);
         if (i != 0) m_links[i-1].end = m_links[i].start;
-
-        // m_links[i].angle = ComputeAngle(direction);
         
         // Will be removed
-        // float a = 0.f;
-        // if (i == 0) {
-        //     a = m_links[i].angle; // Use the angle with the X axis
-        // } else {
-        //     const sf::Vector2f parentDirection = m_links[i-1].GetDirection(); // Previous link direction (normalized)
-        //     const float cross = parentDirection.x * direction.y - parentDirection.y * direction.x;
-        //     const float dot = parentDirection.x * direction.x + parentDirection.y * direction.y;
-        //     a = -atan2(cross, dot); // Angle CCW ([-PI, PI]) from parent link (i-1) to child link (i)
-        // }
-        // // if (a < 0.) { a += 2 * M_PI; } // [0, 2PI]
-        // m_links[i].angle = a;
+        float a = 0.f; // Angle CCW from m_links[i-1] to m_links[i]
+        if (i == 0) {
+            a = m_links[i].angle; // Use the angle with the X axis
+        } else {
+            const sf::Vector2f parentDirection = m_links[i-1].GetDirection(); // Previous link direction (normalized)
+            const float cross = parentDirection.x * direction.y - parentDirection.y * direction.x;
+            const float dot = parentDirection.x * direction.x + parentDirection.y * direction.y;
+            a = -atan2(cross, dot); // Angle CCW ([-PI, PI]) from parent link (i-1) to child link (i)
+        }
+        a += M_PI;
+        
+        // if (a >= 3.*M_PI/2. || a <= M_PI) {
+        if (a >= M_PI || a <= M_PI/2.) {
+            m_links[i].start.SetColor(sf::Color::Red);
+            m_links[i].end.SetColor(sf::Color::Red);
+        } else {
+            m_links[i].start.SetColor(sf::Color::White);
+            m_links[i].end.SetColor(sf::Color::White);
+        }
 
         /*
         const float clamped = std::clamp(a, constraintMin, constraintMax);
